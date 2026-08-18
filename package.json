@@ -1,0 +1,10 @@
+{
+  "name": "pweb2-cap03-http-nativo",
+  "version": "1.0.0",
+  "description": "Atividade Cap. 3 — servidor HTTP com a biblioteca padrão do Node (node:http).",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "check": "node autograder/check.mjs"
+  }
+}
