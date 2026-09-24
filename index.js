@@ -61,6 +61,16 @@ if (method === 'GET' && url === '/sobre') {
     return res.end('Agente desconhecido');
   }
 
+  if (method === 'GET' && url === '/secreto') {
+    const senha = headers['x-senha'];
+    if (senha === '1234') {
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('Acesso liberado');
+    }
+    res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('Não autorizado');
+  }
+
 
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
