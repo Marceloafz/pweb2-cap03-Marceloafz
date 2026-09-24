@@ -32,6 +32,13 @@ if (method === 'GET' && url === '/sobre') {
     return;
   }
 
+  if (method === 'PUT' && partes[0] === 'itens' && partes.length === 2) {
+    const id = partes[1];
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end(`Item ${id} atualizado`);
+  }
+
+
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('Rota não encontrada');
