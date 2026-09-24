@@ -38,6 +38,11 @@ if (method === 'GET' && url === '/sobre') {
     return res.end(`Item ${id} atualizado`);
   }
 
+  if (method === 'DELETE' && partes[0] === 'itens' && partes.length === 2) {
+    res.writeHead(204);
+    return res.end();
+  }
+
 
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
