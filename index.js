@@ -53,6 +53,14 @@ if (method === 'GET' && url === '/sobre') {
     return res.end();
   }
 
+   if (method === 'GET' && url === '/agente') {
+    const agente = (headers['user-agent'] || '').toLowerCase();
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    if (agente.includes('curl')) return res.end('Você é o cURL');
+    if (agente.includes('chrome')) return res.end('Você é um navegador');
+    return res.end('Agente desconhecido');
+  }
+
 
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
