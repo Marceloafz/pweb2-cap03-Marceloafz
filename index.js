@@ -22,6 +22,16 @@ if (method === 'GET' && url === '/sobre') {
     return res.end(`Olá, ${nome}!`);
   }
 
+  if (method === 'POST' && url === '/echo') {
+    let corpo = '';
+    req.on('data', (parte) => (corpo += parte));
+    req.on('end', () => {
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end(corpo);
+    });
+    return;
+  }
+
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('Rota não encontrada');
