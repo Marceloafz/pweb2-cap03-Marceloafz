@@ -16,6 +16,12 @@ if (method === 'GET' && url === '/sobre') {
     return res.end('<h1>Sobre</h1><p>Servidor feito com node:http.</p>');
   }
 
+  if (method === 'GET' && partes[0] === 'saudacao' && partes.length === 2) {
+    const nome = partes[1];
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end(`Olá, ${nome}!`);
+  }
+
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('Rota não encontrada');
