@@ -1,59 +1,54 @@
-# Atividade Cap. 3 — Servidor HTTP com a biblioteca padrão
+# Delivery Tracker — Exercício do Capítulo 4
 
-> **Programação Web II — IFAL/Maceió.** Atividade **formativa** (não vale nota). O objetivo é
-> praticar HTTP "na mão" com o módulo nativo do Node **antes** de conhecer o Express — e sentir
-> por que um framework é útil.
+> **Programação Web II — IFAL/Maceió.** Este é o **projeto do semestre** (avaliado). No Cap. 4 você
+> inicia a **Delivery Tracker API** com **arquitetura em camadas** e, depois, **Repository Pattern +
+> injeção de dependência**. A correção é **automática** (autograder de conformidade) + arquitetura.
 
-## O que você vai fazer
+## Como usar este repositório
 
-Implementar, **usando apenas `node:http`** (sem Express), um servidor web com **10 rotas** que
-variam método HTTP, leitura de corpo e checagem de cabeçalhos. O servidor deve ouvir em
-`process.env.PORT || 3000`.
+1. Clique em **"Use this template"** e crie **`pweb2-delivery-<matricula>`** (ex.: `pweb2-delivery-20231012345`).
+   Este é o repositório que você usará o **semestre inteiro** (evolui a cada capítulo).
+2. Clone, instale e rode:
+   ```bash
+   npm install
+   npm start                                        # http://localhost:3000
+   # em outro terminal — autograder:
+   npm run check                                    # = BASE_URL=http://localhost:3000 node autograder/check.mjs
+   ```
+3. A cada `git push`, o **GitHub Actions** roda o autograder e mostra a nota na aba **Actions**
+   (resumo do job). O `autograder/check.mjs` é **aberto** — leia para saber exatamente o que se espera.
 
-Todo o código vai no arquivo **`index.js`** (que começa vazio).
+## O que implementar (em `src/`)
 
-## Como funciona a correção automática
-
-A cada `git push`, o **GitHub Actions** sobe o seu servidor e roda o autograder
-(`autograder/check.mjs`), que testa as rotas em caixa-preta. O resultado aparece na aba
-**Actions** → no **resumo do job** (tabela ✅/❌ + nota). Rode também localmente:
-
-```bash
-npm start                     # em um terminal
-npm run check                 # em outro (usa BASE_URL=http://localhost:3000)
+```
+src/
+├── controllers/   # traduz HTTP ↔ service (sem regra de negócio)
+├── services/      # TODA a regra de negócio
+├── repositories/  # só acesso a dados
+├── database/      # persistência SIMULADA em memória (sem banco real, sem ORM)
+├── routes/        # composição das dependências (injeção) + monta em /api
+└── utils/
 ```
 
-> O autograder é aberto — leia `autograder/check.mjs` para entender exatamente o que se espera.
+- **Regra de negócio só no Service.** Injeção de dependência no **composition root** (`src/routes`).
+- O `server.js` só configura o app (já traz o `GET /api/health` exigido — não remova).
 
-## Contrato das rotas
+## Duas etapas (ver os enunciados completos)
 
-As respostas são **exatas** (o corretor compara o texto, sem espaços nas pontas):
+- **Atividade 05 — Entregas em camadas:** CRUD de `/api/entregas`, ciclo de status
+  (`CRIADA → EM_TRANSITO → ENTREGUE`/`CANCELADA`), histórico. Meta: checagens de **Entregas** verdes.
+- **Atividade 06 — Motoristas + Contratos + DI:** `/api/motoristas`, atribuição de motorista,
+  contratos de repository (JSDoc) e composição num ponto único. Meta: **122/122**.
 
-| # | Método | Rota | Regra | Resposta esperada |
-|---|---|---|---|---|
-| 1 | `GET` | `/` | — | `200` · texto · `Olá, Mundo!` |
-| 2 | `GET` | `/sobre` | HTML como texto | `200` · `Content-Type: text/html` · corpo contém `<h1>Sobre</h1>` |
-| 3 | `GET` | `/saudacao/:nome` | ler o nome da URL | `200` · `Olá, {nome}!` (ex.: `/saudacao/Ana` → `Olá, Ana!`) |
-| 4 | `POST` | `/echo` | ler o corpo e devolver | `200` · o **mesmo corpo** enviado |
-| 5 | `PUT` | `/itens/:id` | ler o id da URL | `200` · `Item {id} atualizado` |
-| 6 | `DELETE` | `/itens/:id` | status sem corpo | `204` · (corpo vazio) |
-| 7 | `PATCH` | `/config` | — | `200` · `Configuração atualizada` |
-| 8 | `HEAD` | `/status` | cabeçalho de resposta | `200` · cabeçalho `X-Status: ok` · sem corpo |
-| 9 | `GET` | `/agente` | checar `User-Agent` | contém `curl` → `Você é o cURL` · contém `chrome` → `Você é um navegador` · senão → `Agente desconhecido` |
-| 10 | `GET` | `/secreto` | checar cabeçalho `X-Senha` | `X-Senha: 1234` → `200` `Acesso liberado` · senão → `401` `Não autorizado` |
-| — | qualquer | rota não mapeada | *fallback* | `404` (texto livre) |
+> O critério de **inversão de dependência** é verificado pelo professor **trocando o repository por
+> um Mock** que respeita o contrato — programe contra o contrato desde o início.
 
-Dicas: a comparação de `User-Agent` deve ser **indiferente a maiúsculas/minúsculas**; para o
-`POST /echo`, leia o corpo com os eventos `data`/`end` do `req`.
+## Contrato (resumo)
 
-## Passo a passo
+- Base `/api` · JSON · erro `{ "erro": "..." }` · `GET /api/health` → `{ "status": "ok" }`.
+- Status: `201` criar · `400` entrada inválida · `404` não encontrado · `409` unicidade
+  (duplicata/CPF) · `422` regra de estado (transição/atribuição inválida).
+- Execução: `npm start`, respeita `process.env.PORT`, branch `main`.
 
-O guia completo, com comandos e dicas por rota, está em **[`PASSO-A-PASSO.md`](PASSO-A-PASSO.md)**.
-Em resumo:
-
-1. Clique em **"Use this template"** para criar o seu repositório.
-2. Clone, rode `npm start` e comece a implementar o `index.js`.
-3. **Resolva uma rota por commit**, seguindo o padrão em [`COMMITS.md`](COMMITS.md).
-4. Dê `push` e acompanhe o autograder na aba **Actions**. Meta: **100%**.
-
+Faça **um commit por avanço** (Conventional Commits, ex.: `feat(entregas): valida origem ≠ destino`).
 Bom trabalho! 🚀
