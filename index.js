@@ -48,6 +48,11 @@ if (method === 'GET' && url === '/sobre') {
     return res.end('Configuração atualizada');
   }
 
+  if (method === 'HEAD' && url === '/status') {
+    res.writeHead(200, { 'X-Status': 'ok' });
+    return res.end();
+  }
+
 
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
