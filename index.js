@@ -43,6 +43,11 @@ if (method === 'GET' && url === '/sobre') {
     return res.end();
   }
 
+  if (method === 'PATCH' && url === '/config') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    return res.end('Configuração atualizada');
+  }
+
 
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
