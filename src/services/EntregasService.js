@@ -1,6 +1,5 @@
 import { RegraNegocioError } from '../utils/RegraNegocioError.js';
 
-
 const PROXIMO_STATUS = {
   CRIADA: 'EM_TRANSITO',
   EM_TRANSITO: 'ENTREGUE',
@@ -11,14 +10,13 @@ function agoraISO() {
 }
 
 export class EntregasService {
-  constructor(entregasRepository) {
+  constructor(entregasRepository, motoristasRepository) {
     this.repository = entregasRepository;
+    this.motoristasRepository = motoristasRepository;
   }
 
-  listar(status) {
-    const todas = this.repository.listarTodas();
-    if (!status) return todas;
-    return todas.filter((entrega) => entrega.status === status);
+  listar(filtros = {}) {
+    return this.repository.listarTodos(filtros);
   }
 
   buscarPorId(id) {
@@ -45,11 +43,9 @@ export class EntregasService {
       throw new RegraNegocioError(400, 'origem e destino não podem ser iguais');
     }
 
-
-    const duplicata = this.repository.buscarAtivaPorChave(
-      descricao,
-      origem,
-      destino
+    const candidatas = this.repository.listarTodos({ descricao, origem, destino });
+    const duplicata = candidatas.find(
+      (entrega) => entrega.status !== 'ENTREGUE' && entrega.status !== 'CANCELADA'
     );
     if (duplicata) {
       throw new RegraNegocioError(
@@ -69,7 +65,7 @@ export class EntregasService {
   }
 
   avancar(id) {
-    const entrega = this.buscarPorId(id); 
+    const entrega = this.buscarPorId(id);
 
     const proximo = PROXIMO_STATUS[entrega.status];
     if (!proximo) {
@@ -88,7 +84,7 @@ export class EntregasService {
   }
 
   cancelar(id) {
-    const entrega = this.buscarPorId(id); 
+    const entrega = this.buscarPorId(id);
 
     if (entrega.status === 'ENTREGUE' || entrega.status === 'CANCELADA') {
       throw new RegraNegocioError(
@@ -106,5 +102,31 @@ export class EntregasService {
       status: 'CANCELADA',
       historico,
     });
+  }
+
+  atribuir(id, motoristaId) {
+    const entrega = this.buscarPorId(id);
+
+    if (entrega.status !== 'CRIADA') {
+      throw new RegraNegocioError(
+        422,
+        `só é possível atribuir motorista a uma entrega CRIADA (status atual: ${entrega.status})`
+      );
+    }
+
+    const motorista = this.motoristasRepository.buscarPorId(motoristaId);
+    if (!motorista) {
+      throw new RegraNegocioError(404, 'motorista não encontrado');
+    }
+    if (motorista.status !== 'ATIVO') {
+      throw new RegraNegocioError(422, 'só é possível atribuir um motorista ATIVO');
+    }
+
+    const historico = [
+      ...entrega.historico,
+      { data: agoraISO(), descricao: `Motorista ${motoristaId} atribuído` },
+    ];
+
+    return this.repository.atualizar(id, { motoristaId, historico });
   }
 }
