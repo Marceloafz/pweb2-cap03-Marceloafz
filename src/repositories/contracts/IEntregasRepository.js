@@ -1,31 +1,17 @@
-import { IEntregasRepository } from './contracts/IEntregasRepository.js';
-
-const TABELA = 'entregas';
-
-export class EntregasRepository extends IEntregasRepository {
-  constructor(database) {
-    super();
-    this.database = database;
-  }
-
-  listarTodos(filtros = {}) {
-    const todas = this.database.todos(TABELA);
-    const chaves = Object.keys(filtros).filter((chave) => filtros[chave] !== undefined);
-    if (chaves.length === 0) return todas;
-    return todas.filter((entrega) =>
-      chaves.every((chave) => entrega[chave] === filtros[chave])
-    );
+export class IEntregasRepository {
+  listarTodos(filtros) {
+    throw new Error('IEntregasRepository.listarTodos não implementado');
   }
 
   buscarPorId(id) {
-    return this.database.buscarPorId(TABELA, id) ?? null;
+    throw new Error('IEntregasRepository.buscarPorId não implementado');
   }
 
-  criar(dadosSemId) {
-    return this.database.inserir(TABELA, dadosSemId);
+  criar(dados) {
+    throw new Error('IEntregasRepository.criar não implementado');
   }
 
-  atualizar(id, novosDados) {
-    return this.database.atualizar(TABELA, id, novosDados);
+  atualizar(id, dados) {
+    throw new Error('IEntregasRepository.atualizar não implementado');
   }
 }

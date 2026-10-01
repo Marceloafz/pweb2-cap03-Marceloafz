@@ -2,18 +2,19 @@ export class EntregasController {
   constructor(entregasService) {
     this.service = entregasService;
 
-
     this.listar = this.listar.bind(this);
     this.buscarPorId = this.buscarPorId.bind(this);
     this.historico = this.historico.bind(this);
     this.criar = this.criar.bind(this);
     this.avancar = this.avancar.bind(this);
     this.cancelar = this.cancelar.bind(this);
+    this.atribuir = this.atribuir.bind(this);
   }
 
   listar(req, res) {
     const { status } = req.query;
-    const entregas = this.service.listar(status);
+    const filtros = status ? { status } : {};
+    const entregas = this.service.listar(filtros);
     res.status(200).json(entregas);
   }
 
@@ -56,6 +57,16 @@ export class EntregasController {
   cancelar(req, res) {
     try {
       const entrega = this.service.cancelar(Number(req.params.id));
+      res.status(200).json(entrega);
+    } catch (erro) {
+      this._responderErro(res, erro);
+    }
+  }
+
+  atribuir(req, res) {
+    try {
+      const motoristaId = Number(req.body?.motoristaId);
+      const entrega = this.service.atribuir(Number(req.params.id), motoristaId);
       res.status(200).json(entrega);
     } catch (erro) {
       this._responderErro(res, erro);
