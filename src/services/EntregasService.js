@@ -106,6 +106,11 @@ export class EntregasService {
 
   atribuir(id, motoristaId) {
     const entrega = this.buscarPorId(id);
+    const motoristaIdNumerico = Number(motoristaId);
+
+    if (!Number.isInteger(motoristaIdNumerico)) {
+      throw new RegraNegocioError(400, 'motoristaId é obrigatório');
+    }
 
     if (entrega.status !== 'CRIADA') {
       throw new RegraNegocioError(
@@ -114,7 +119,7 @@ export class EntregasService {
       );
     }
 
-    const motorista = this.motoristasRepository.buscarPorId(motoristaId);
+    const motorista = this.motoristasRepository.buscarPorId(motoristaIdNumerico);
     if (!motorista) {
       throw new RegraNegocioError(404, 'motorista não encontrado');
     }
@@ -124,9 +129,9 @@ export class EntregasService {
 
     const historico = [
       ...entrega.historico,
-      { data: agoraISO(), descricao: `Motorista ${motoristaId} atribuído` },
+      { data: agoraISO(), descricao: `Motorista ${motoristaIdNumerico} atribuído` },
     ];
 
-    return this.repository.atualizar(id, { motoristaId, historico });
+    return this.repository.atualizar(id, { motoristaId: motoristaIdNumerico, historico });
   }
 }
