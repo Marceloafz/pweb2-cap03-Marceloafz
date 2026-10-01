@@ -1,10 +1,14 @@
 {
-  "name": "pweb2-cap03-http-nativo",
+  "name": "pweb2-delivery-cap04",
   "version": "1.0.0",
-  "description": "Atividade Cap. 3 — servidor HTTP com a biblioteca padrão do Node (node:http).",
+  "description": "Delivery Tracker API — arquitetura em camadas (Controller/Service/Repository).",
   "type": "module",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "check": "node autograder/check.mjs"
+    "start": "node server.js",
+    "check": "BASE_URL=http://localhost:3000 node autograder/check.mjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
   }
 }
