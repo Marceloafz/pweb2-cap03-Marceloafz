@@ -1,29 +1,24 @@
+import { IEntregasRepository } from './contracts/IEntregasRepository.js';
+
 const TABELA = 'entregas';
 
-export class EntregasRepository {
+export class EntregasRepository extends IEntregasRepository {
   constructor(database) {
+    super();
     this.database = database;
   }
 
-  listarTodas() {
-    return this.database.todos(TABELA);
+  listarTodos(filtros = {}) {
+    const todas = this.database.todos(TABELA);
+    const chaves = Object.keys(filtros).filter((chave) => filtros[chave] !== undefined);
+    if (chaves.length === 0) return todas;
+    return todas.filter((entrega) =>
+      chaves.every((chave) => entrega[chave] === filtros[chave])
+    );
   }
 
   buscarPorId(id) {
-    return this.database.buscarPorId(TABELA, id);
-  }
-
-  buscarAtivaPorChave(descricao, origem, destino) {
-    return this.database
-      .todos(TABELA)
-      .find(
-        (entrega) =>
-          entrega.descricao === descricao &&
-          entrega.origem === origem &&
-          entrega.destino === destino &&
-          entrega.status !== 'ENTREGUE' &&
-          entrega.status !== 'CANCELADA'
-      );
+    return this.database.buscarPorId(TABELA, id) ?? null;
   }
 
   criar(dadosSemId) {
