@@ -15,23 +15,23 @@ export class EntregasService {
     this.motoristasRepository = motoristasRepository;
   }
 
-  listar(filtros = {}) {
+  async listar(filtros = {}) {
     return this.repository.listarTodos(filtros);
   }
 
-  buscarPorId(id) {
-    const entrega = this.repository.buscarPorId(id);
+  async buscarPorId(id) {
+    const entrega = await this.repository.buscarPorId(id);
     if (!entrega) {
       throw new RegraNegocioError(404, 'entrega não encontrada');
     }
     return entrega;
   }
 
-  buscarHistorico(id) {
-    return this.buscarPorId(id).historico;
+  async buscarHistorico(id) {
+    return (await this.buscarPorId(id)).historico;
   }
 
-  criar({ descricao, origem, destino }) {
+  async criar({ descricao, origem, destino }) {
     if (!descricao || !origem || !destino) {
       throw new RegraNegocioError(
         400,
@@ -43,7 +43,7 @@ export class EntregasService {
       throw new RegraNegocioError(400, 'origem e destino não podem ser iguais');
     }
 
-    const candidatas = this.repository.listarTodos({ descricao, origem, destino });
+    const candidatas = await this.repository.listarTodos({ descricao, origem, destino });
     const duplicata = candidatas.find(
       (entrega) => entrega.status !== 'ENTREGUE' && entrega.status !== 'CANCELADA'
     );
@@ -64,8 +64,8 @@ export class EntregasService {
     });
   }
 
-  avancar(id) {
-    const entrega = this.buscarPorId(id);
+  async avancar(id) {
+    const entrega = await this.buscarPorId(id);
 
     const proximo = PROXIMO_STATUS[entrega.status];
     if (!proximo) {
@@ -83,8 +83,8 @@ export class EntregasService {
     return this.repository.atualizar(id, { status: proximo, historico });
   }
 
-  cancelar(id) {
-    const entrega = this.buscarPorId(id);
+  async cancelar(id) {
+    const entrega = await this.buscarPorId(id);
 
     if (entrega.status === 'ENTREGUE' || entrega.status === 'CANCELADA') {
       throw new RegraNegocioError(
@@ -104,8 +104,8 @@ export class EntregasService {
     });
   }
 
-  atribuir(id, motoristaId) {
-    const entrega = this.buscarPorId(id);
+  async atribuir(id, motoristaId) {
+    const entrega = await this.buscarPorId(id);
     const motoristaIdNumerico = Number(motoristaId);
 
     if (!Number.isInteger(motoristaIdNumerico)) {
@@ -119,7 +119,7 @@ export class EntregasService {
       );
     }
 
-    const motorista = this.motoristasRepository.buscarPorId(motoristaIdNumerico);
+    const motorista = await this.motoristasRepository.buscarPorId(motoristaIdNumerico);
     if (!motorista) {
       throw new RegraNegocioError(404, 'motorista não encontrado');
     }

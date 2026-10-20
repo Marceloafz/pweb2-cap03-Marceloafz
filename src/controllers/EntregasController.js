@@ -11,62 +11,66 @@ export class EntregasController {
     this.atribuir = this.atribuir.bind(this);
   }
 
-  listar(req, res) {
+  async listar(req, res) {
     const { status } = req.query;
     const filtros = status ? { status } : {};
-    const entregas = this.service.listar(filtros);
-    res.status(200).json(entregas);
+    try {
+      const entregas = await this.service.listar(filtros);
+      res.status(200).json(entregas);
+    } catch (erro) {
+      this._responderErro(res, erro);
+    }
   }
 
-  buscarPorId(req, res) {
+  async buscarPorId(req, res) {
     try {
-      const entrega = this.service.buscarPorId(Number(req.params.id));
+      const entrega = await this.service.buscarPorId(Number(req.params.id));
       res.status(200).json(entrega);
     } catch (erro) {
       this._responderErro(res, erro);
     }
   }
 
-  historico(req, res) {
+  async historico(req, res) {
     try {
-      const eventos = this.service.buscarHistorico(Number(req.params.id));
+      const eventos = await this.service.buscarHistorico(Number(req.params.id));
       res.status(200).json(eventos);
     } catch (erro) {
       this._responderErro(res, erro);
     }
   }
 
-  criar(req, res) {
+  async criar(req, res) {
     try {
-      const entrega = this.service.criar(req.body || {});
+      const entrega = await this.service.criar(req.body || {});
       res.status(201).json(entrega);
     } catch (erro) {
       this._responderErro(res, erro);
     }
   }
 
-  avancar(req, res) {
+  async avancar(req, res) {
     try {
-      const entrega = this.service.avancar(Number(req.params.id));
+      const entrega = await this.service.avancar(Number(req.params.id));
       res.status(200).json(entrega);
     } catch (erro) {
       this._responderErro(res, erro);
     }
   }
 
-  cancelar(req, res) {
+  async cancelar(req, res) {
     try {
-      const entrega = this.service.cancelar(Number(req.params.id));
+      const entrega = await this.service.cancelar(Number(req.params.id));
       res.status(200).json(entrega);
     } catch (erro) {
       this._responderErro(res, erro);
     }
   }
 
-  atribuir(req, res) {
+  async atribuir(req, res) {
     try {
       const motoristaId = Number(req.body?.motoristaId);
-      const entrega = this.service.atribuir(Number(req.params.id), motoristaId);
+      const entrega = await this.service.atribuir(Number(req.params.id), motoristaId);
       res.status(200).json(entrega);
     } catch (erro) {
       this._responderErro(res, erro);

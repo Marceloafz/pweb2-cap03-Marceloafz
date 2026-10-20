@@ -8,32 +8,36 @@ export class MotoristasController {
     this.entregas = this.entregas.bind(this);
   }
 
-  criar(req, res) {
+  async criar(req, res) {
     try {
-      const motorista = this.service.criar(req.body || {});
+      const motorista = await this.service.criar(req.body || {});
       res.status(201).json(motorista);
     } catch (erro) {
       this._responderErro(res, erro);
     }
   }
 
-  listar(req, res) {
-    res.status(200).json(this.service.listar());
+  async listar(req, res) {
+    try {
+      res.status(200).json(await this.service.listar());
+    } catch (erro) {
+      this._responderErro(res, erro);
+    }
   }
 
-  buscarPorId(req, res) {
+  async buscarPorId(req, res) {
     try {
-      const motorista = this.service.buscarPorId(Number(req.params.id));
+      const motorista = await this.service.buscarPorId(Number(req.params.id));
       res.status(200).json(motorista);
     } catch (erro) {
       this._responderErro(res, erro);
     }
   }
 
-  entregas(req, res) {
+  async entregas(req, res) {
     try {
       const { status } = req.query;
-      const entregas = this.service.entregasDoMotorista(Number(req.params.id), status);
+      const entregas = await this.service.entregasDoMotorista(Number(req.params.id), status);
       res.status(200).json(entregas);
     } catch (erro) {
       this._responderErro(res, erro);

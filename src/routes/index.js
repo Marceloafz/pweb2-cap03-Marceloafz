@@ -1,26 +1,20 @@
 import { Router } from 'express';
-import { Database } from '../database/Database.js';
-import { EntregasRepository } from '../repositories/EntregasRepository.js';
-import { MotoristasRepository } from '../repositories/MotoristasRepository.js';
+import prisma from '../config/database.js';
+import { EntregasRepositoryPrisma } from '../repositories/EntregasRepository.prisma.js';
+import { MotoristasRepositoryPrisma } from '../repositories/MotoristasRepository.prisma.js';
 import { EntregasService } from '../services/EntregasService.js';
 import { MotoristasService } from '../services/MotoristasService.js';
 import { EntregasController } from '../controllers/EntregasController.js';
 import { MotoristasController } from '../controllers/MotoristasController.js';
 
-
-const database = new Database();
-
-
-const entregasRepository = new EntregasRepository(database);
-const motoristasRepository = new MotoristasRepository(database);
-
+const entregasRepository = new EntregasRepositoryPrisma(prisma);
+const motoristasRepository = new MotoristasRepositoryPrisma(prisma);
 
 const entregasService = new EntregasService(entregasRepository, motoristasRepository);
 const motoristasService = new MotoristasService(motoristasRepository, entregasRepository);
 
 const entregasController = new EntregasController(entregasService);
 const motoristasController = new MotoristasController(motoristasService);
-
 const router = Router();
 
 router.post('/entregas', entregasController.criar);

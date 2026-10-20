@@ -10,20 +10,20 @@ export class MotoristasService {
     return this.repository.listarTodos();
   }
 
-  buscarPorId(id) {
-    const motorista = this.repository.buscarPorId(id);
+  async buscarPorId(id) {
+    const motorista = await this.repository.buscarPorId(id);
     if (!motorista) {
       throw new RegraNegocioError(404, 'motorista não encontrado');
     }
     return motorista;
   }
 
-  criar({ nome, cpf, placaVeiculo }) {
+  async criar({ nome, cpf, placaVeiculo }) {
     if (!nome || !cpf) {
       throw new RegraNegocioError(400, 'nome e cpf são obrigatórios');
     }
 
-    const existente = this.repository.buscarPorCpf(cpf);
+    const existente = await this.repository.buscarPorCpf(cpf);
     if (existente) {
       throw new RegraNegocioError(409, `já existe um motorista cadastrado com o CPF ${cpf}`);
     }
@@ -36,8 +36,8 @@ export class MotoristasService {
     });
   }
 
-  entregasDoMotorista(id, status) {
-    this.buscarPorId(id);
+  async entregasDoMotorista(id, status) {
+    await this.buscarPorId(id);
 
     const filtros = { motoristaId: id };
     if (status) filtros.status = status;

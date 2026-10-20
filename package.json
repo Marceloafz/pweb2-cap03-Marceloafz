@@ -6,9 +6,16 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "check": "BASE_URL=http://localhost:3000 node autograder/check.mjs"
+    "check": "node autograder/check.mjs",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
+    "@prisma/client": "^6.16.3",
+    "dotenv": "^16.6.1",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.16.3"
   }
 }
