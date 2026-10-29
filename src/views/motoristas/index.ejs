@@ -1,0 +1,29 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Equipe</p>
+    <h1>Motoristas</h1>
+    <p class="muted">Motoristas cadastrados no Delivery Tracker.</p>
+  </div>
+  <a class="button button-primary" href="/motoristas/novo">+ Novo motorista</a>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>CPF</th><th>Status</th></tr></thead>
+      <tbody>
+        <% if (motoristas.length) { %>
+          <% for (const motorista of motoristas) { %>
+            <tr>
+              <td><strong><%= motorista.nome %></strong></td>
+              <td><%= motorista.cpf %></td>
+              <td><span class="badge badge-<%= motorista.status.toLowerCase() %>"><%= motorista.status %></span></td>
+            </tr>
+          <% } %>
+        <% } else { %>
+          <tr><td class="muted" colspan="3">Nenhum motorista cadastrado.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>

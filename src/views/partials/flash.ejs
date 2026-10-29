@@ -1,0 +1,6 @@
+<% for (const message of flash.success) { %>
+  <div class="notice notice-success" role="status"><%= message %></div>
+<% } %>
+<% for (const message of flash.error) { %>
+  <div class="notice notice-error" role="alert"><%= message %></div>
+<% } %>

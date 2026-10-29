@@ -1,0 +1,65 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Entrega #<%= entrega.id %></p>
+    <h1><%= entrega.descricao %></h1>
+    <p class="muted"><%= entrega.origem %> <span aria-hidden="true">→</span> <%= entrega.destino %></p>
+  </div>
+  <a class="button button-secondary" href="/entregas">Todas as entregas</a>
+</section>
+
+<section class="detail-grid">
+  <article class="panel">
+    <h2>Detalhes da entrega</h2>
+    <dl class="details">
+      <div><dt>Status</dt><dd><span class="badge badge-<%= entrega.status.toLowerCase() %>"><%= entrega.status.replace('_', ' ') %></span></dd></div>
+      <div><dt>Origem</dt><dd><%= entrega.origem %></dd></div>
+      <div><dt>Destino</dt><dd><%= entrega.destino %></dd></div>
+      <div><dt>Motorista</dt><dd><%= entrega.motoristaId ? `#${entrega.motoristaId}` : 'Não atribuído' %></dd></div>
+    </dl>
+  </article>
+
+  <article class="panel">
+    <h2>Ações</h2>
+    <div class="action-list">
+      <% if (entrega.status === 'CRIADA' || entrega.status === 'EM_TRANSITO') { %>
+        <form action="/entregas/<%= entrega.id %>/avancar?_method=PATCH" method="POST">
+          <button class="button button-primary" type="submit">Avançar status</button>
+        </form>
+        <form action="/entregas/<%= entrega.id %>/cancelar?_method=PATCH" method="POST">
+          <button class="button button-danger" type="submit">Cancelar entrega</button>
+        </form>
+      <% } %>
+      <% if (entrega.status === 'CRIADA') { %>
+        <form class="assign-form" action="/entregas/<%= entrega.id %>/atribuir?_method=PATCH" method="POST">
+          <label for="motoristaId">Atribuir motorista</label>
+          <select id="motoristaId" name="motoristaId" required>
+            <option value="">Selecione um motorista</option>
+            <% for (const motorista of motoristas.filter((item) => item.status === 'ATIVO')) { %>
+              <option value="<%= motorista.id %>" <%= entrega.motoristaId === motorista.id ? 'selected' : '' %>><%= motorista.nome %></option>
+            <% } %>
+          </select>
+          <button class="button button-secondary" type="submit">Atribuir</button>
+        </form>
+      <% } %>
+      <% if (entrega.status === 'ENTREGUE' || entrega.status === 'CANCELADA') { %>
+        <p class="muted">Não há ações disponíveis para esta entrega.</p>
+      <% } %>
+    </div>
+  </article>
+</section>
+
+<section class="panel history-panel">
+  <h2>Histórico</h2>
+  <% if (entrega.historico.length) { %>
+    <ol class="timeline">
+      <% for (const evento of entrega.historico) { %>
+        <li>
+          <span class="timeline-dot" aria-hidden="true"></span>
+          <div><strong><%= evento.descricao %></strong><time datetime="<%= evento.data %>"><%= new Date(evento.data).toLocaleString('pt-BR') %></time></div>
+        </li>
+      <% } %>
+    </ol>
+  <% } else { %>
+    <p class="muted">Nenhum evento registrado.</p>
+  <% } %>
+</section>

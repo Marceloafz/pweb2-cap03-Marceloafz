@@ -1,0 +1,29 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Motoristas</p>
+    <h1>Novo motorista</h1>
+    <p class="muted">Preencha os dados do motorista.</p>
+  </div>
+  <a class="button button-secondary" href="/motoristas">Voltar</a>
+</section>
+
+<section class="panel form-panel">
+  <% if (errors.length) { %>
+    <div class="form-errors" role="alert">
+      <p>Revise os dados informados:</p>
+      <ul><% for (const error of errors) { %><li><%= error %></li><% } %></ul>
+    </div>
+  <% } %>
+  <form action="/motoristas" method="POST">
+    <label for="nome">Nome</label>
+    <input id="nome" name="nome" type="text" value="<%= motorista.nome || '' %>" required>
+
+    <label for="cpf">CPF</label>
+    <input id="cpf" name="cpf" type="text" value="<%= motorista.cpf || '' %>" required>
+
+    <div class="form-actions">
+      <button class="button button-primary" type="submit">Cadastrar motorista</button>
+      <a class="text-link" href="/motoristas">Cancelar</a>
+    </div>
+  </form>
+</section>
