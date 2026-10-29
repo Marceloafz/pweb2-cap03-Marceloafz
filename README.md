@@ -1,7 +1,7 @@
-# Delivery Tracker — Prisma + SQLite
+# Delivery Tracker — SSR com EJS, Prisma e SQLite
 
-> **Programação Web II — IFAL/Maceió.** A API utiliza arquitetura em camadas e Repository Pattern.
-> Os repositories Prisma persistem entregas, motoristas e histórico em SQLite.
+> **Programação Web II — IFAL/Maceió.** Interface web renderizada no servidor com EJS.
+> Os services e repositories Prisma persistem entregas, motoristas e histórico em SQLite.
 
 ## Como usar este repositório
 
@@ -17,32 +17,38 @@
    No PowerShell, use `Copy-Item .env.example .env`.
 3. Para aplicar migrations versionadas no deploy, execute `npx prisma migrate deploy`.
    Para inspecionar os dados, use `npx prisma studio`.
-4. Para validar a API, inicie o servidor e rode
+4. Para validar, inicie o servidor e rode
    `BASE_URL=http://localhost:3000 node autograder/check.mjs` (no PowerShell, defina `$env:BASE_URL`).
-   O GitHub Actions gera o Prisma Client, aplica migrations e inicia o servidor a cada push.
+O GitHub Actions gera o Prisma Client, aplica migrations e executa o autograder a cada push.
 
 ## O que implementar (em `src/`)
 
 ```
 src/
-├── controllers/   # traduz HTTP ↔ service (sem regra de negócio)
+├── controllers/   # traduz HTTP ↔ service e renderiza views
 ├── services/      # TODA a regra de negócio
 ├── repositories/  # só acesso a dados
 ├── config/        # singleton do Prisma Client
 ├── database/      # implementação anterior em memória, mantida como referência
-├── routes/        # composição das dependências (injeção) + monta em /api
-└── utils/
+├── routes/        # composição das dependências e rotas web
+├── utils/
+└── views/          # templates EJS, layout e partials
 ```
 
 - **Regra de negócio só no Service.** Injeção de dependência no **composition root** (`src/routes`).
-- O `server.js` só configura o app (já traz o `GET /api/health` exigido — não remova).
+- O `server.js` configura o EJS/layout, sessões, mensagens flash e `method-override`.
+- As páginas usam PRG após gravações; erros de formulário são exibidos junto aos valores informados.
+- `GET /api/health` → `{ "status": "ok" }` para readiness.
 
-## Contrato da API
+## Páginas e ações
 
-- Base `/api` · JSON · erro `{ "erro": "..." }` · `GET /api/health` → `{ "status": "ok" }`.
-- Status: `201` criar · `400` entrada inválida · `404` não encontrado · `409` unicidade
-  (duplicata/CPF) · `422` regra de estado (transição/atribuição inválida).
-- Execução: `npm start`, respeita `process.env.PORT`, branch `main`.
+- `GET /entregas` lista e filtra entregas por status; `GET /entregas/nova` e `POST /entregas`
+  exibem e processam o formulário.
+- `GET /entregas/:id` exibe detalhes e histórico. Ações de avanço, cancelamento e atribuição
+  usam `PATCH /entregas/:id/{avancar,cancelar,atribuir}` (os formulários usam `_method=PATCH`).
+- `GET /motoristas` lista motoristas; `GET /motoristas/novo` e `POST /motoristas` exibem e
+  processam o cadastro.
+- Execução: `npm start` ou `npm run dev`, respeita `process.env.PORT`, branch `main`.
 
 Entregas, motoristas e eventos de histórico são gravados no arquivo SQLite definido em
 `DATABASE_URL`. O CPF do motorista é único. As migrations versionadas ficam em `prisma/migrations/`;

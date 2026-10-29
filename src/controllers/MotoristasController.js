@@ -1,51 +1,57 @@
+import { validationResult } from 'express-validator';
+
 export class MotoristasController {
   constructor(motoristasService) {
     this.service = motoristasService;
 
-    this.criar = this.criar.bind(this);
     this.listar = this.listar.bind(this);
-    this.buscarPorId = this.buscarPorId.bind(this);
-    this.entregas = this.entregas.bind(this);
+    this.novo = this.novo.bind(this);
+    this.criar = this.criar.bind(this);
   }
 
-  async criar(req, res) {
+  async listar(req, res, next) {
     try {
-      const motorista = await this.service.criar(req.body || {});
-      res.status(201).json(motorista);
+      const motoristas = await this.service.listar();
+      res.render('motoristas/index', {
+        title: 'Motoristas',
+        motoristas,
+      });
     } catch (erro) {
-      this._responderErro(res, erro);
+      next(erro);
     }
   }
 
-  async listar(req, res) {
-    try {
-      res.status(200).json(await this.service.listar());
-    } catch (erro) {
-      this._responderErro(res, erro);
-    }
+  novo(req, res) {
+    res.render('motoristas/novo', {
+      title: 'Novo motorista',
+      motorista: {},
+      errors: [],
+    });
   }
 
-  async buscarPorId(req, res) {
-    try {
-      const motorista = await this.service.buscarPorId(Number(req.params.id));
-      res.status(200).json(motorista);
-    } catch (erro) {
-      this._responderErro(res, erro);
+  async criar(req, res, next) {
+    const errors = validationResult(req).array().map((erro) => erro.msg);
+    if (errors.length) {
+      return res.status(400).render('motoristas/novo', {
+        title: 'Novo motorista',
+        motorista: req.body,
+        errors,
+      });
     }
-  }
 
-  async entregas(req, res) {
     try {
-      const { status } = req.query;
-      const entregas = await this.service.entregasDoMotorista(Number(req.params.id), status);
-      res.status(200).json(entregas);
+      await this.service.criar(req.body);
+      req.flash('success', 'Motorista cadastrado com sucesso.');
+      res.redirect('/motoristas');
     } catch (erro) {
-      this._responderErro(res, erro);
+      if (erro.status >= 400 && erro.status < 500) {
+        return res.status(erro.status).render('motoristas/novo', {
+          title: 'Novo motorista',
+          motorista: req.body,
+          errors: [erro.message],
+        });
+      }
+      next(erro);
     }
-  }
-
-  _responderErro(res, erro) {
-    const status = erro.status || 500;
-    res.status(status).json({ erro: erro.message || 'erro interno' });
   }
 }
