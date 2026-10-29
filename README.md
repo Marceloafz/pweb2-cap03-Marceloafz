@@ -53,3 +53,7 @@ src/
 Entregas, motoristas e eventos de histórico são gravados no arquivo SQLite definido em
 `DATABASE_URL`. O CPF do motorista é único. As migrations versionadas ficam em `prisma/migrations/`;
 o arquivo do banco local não deve ser versionado.
+
+
+<img width="1598" height="857" alt="image" src="https://github.com/user-attachments/assets/c2a4d5d3-72da-49d1-bb4a-137127f444eb" />
+
